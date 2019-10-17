@@ -1,0 +1,179 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Tic Tac Toe</title>
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css">
+
+	<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+
+	<div id="app" class="col-md-12 pt-4 h-100 justify-content-center align-items-center">
+
+		<!-- Modal -->
+		<div v-if="showModal" class="modal fade show" style="display: block;" id="menuModal" tabindex="-1" role="dialog">
+		  <div class="modal-dialog modal-dialog-centered" role="document">
+		    <div class="modal-content">
+				<div class="modal-header border-0">
+					<h5 class="modal-title" id="menuModalLongTitle">Menu</h5>
+				</div>
+
+				<div class="modal-body menu border-0">
+
+					<div class="tile_selection d-flex justify-content-around align-items-center">
+
+						<div>
+							<h5>Choose: </h5>
+						</div>
+
+						<div class="selection_tile" v-on:click="menuUserSymbol = 'X'">
+							<i class="fas fa-times align-middle" v-bind:class="{highlight: menuUserSymbol == 'X'}"></i>
+						</div>
+						<div class="selection_tile" v-on:click="menuUserSymbol = 'O'">
+							<i class="fas fa-circle align-middle" v-bind:class="{highlight: menuUserSymbol == 'O'}"></i>
+						</div>
+					</div>
+
+					<div class="turn_selection d-flex justify-content-around align-items-center">
+
+						<div>
+							<h5>First to Go: </h5>
+						</div>
+						<div class="selection_tile mr-2" v-on:click="menuFirstTurn = 'user'">
+							<span>
+								<i class="fas fa-user" v-bind:class="{highlight: menuFirstTurn == 'user'}"></i>
+							</span>
+						</div>
+						<div class="selection_tile mr-2" v-on:click="menuFirstTurn = 'cpu'">
+							<span>
+								<i class="fas fa-desktop" v-bind:class="{highlight: menuFirstTurn == 'cpu'}"></i>
+							</span>
+						</div>
+
+					</div>
+
+				</div>
+
+				<div class="modal-footer border-0 justify-content-center">
+					<button type="button" class="btn" data-dismiss="modal" v-on:click="startGame()">START GAME</button>
+				</div>
+
+		    </div>
+		  </div>
+		</div>
+
+
+		<h1 class="w-100 text-center mb-4">Tic Tac <span class="highlight">Toe</span></h1>
+
+		<div class="row col-md-10">
+
+			<!-- Board Section -->
+			<div class="board col-md-6 offset-2 justify-content-center">
+
+				<div class="d-flex flex-wrap">
+					<div class="cell col-md-4 d-flex flex-wrap justify-content-center align-items-center" v-for="(tile, i) in board" v-on:click="makeMove(i)">
+
+						<span v-if="tile == 'X'">
+							<i class="fas fa-times" v-bind:class="{highlight: win_cell[i]}"></i>
+						</span>
+						<span v-else-if="tile == 'O'">
+							<i class="far fa-circle" v-bind:class="{highlight: win_cell[i]}"></i>
+						</span>
+						<span v-else>
+						</span>
+
+					</div>
+				</div>
+
+			</div>
+
+			<!-- Meta Section -->
+			<div class="meta_info col-md-4 d-flex flex-column justify-content-md-between">
+
+				<div>
+					<div class="label text-center p-3 w-100">
+						<h3 v-html="printInfo"></h3>
+					</div>
+
+					<div class="move_history d-flex flex-wrap">
+
+						<div class="w-50 d-flex justify-content-center align-items-center border-1">
+							<span class="h5 font-weight-bold">X</span>
+						</div>
+
+						<div class="w-50 d-flex justify-content-center align-items-center">
+							<span class="h5 font-weight-bold">O</span>
+						</div>
+
+						<div class="move w-50 d-flex justify-content-center" v-for="(move, i) in moveHistory">
+
+							<span class="h6 h-100 d-flex align-items-center">{{ move }}</span>
+
+						</div>
+
+					</div>
+				</div>
+
+				<div>
+					<div class="scoreboard d-flex flex-wrap p-2">
+
+						<h4 class="text-center w-100 p-2">Scoreboard</h4>
+
+						<div class="w-50 d-flex justify-content-center align-items-center border-1">
+							<span class="h5 font-weight-bold">X</span>
+						</div>
+
+						<div class="w-50 d-flex justify-content-center align-items-center">
+							<span class="h5 font-weight-bold">O</span>
+						</div>
+
+						<div class="w-50 d-flex justify-content-center align-items-center">
+							<span v-bind:class="{highlight: winner == 'X'}" class="h5 font-weight-bold">{{ x_points }}</span>
+						</div>
+
+						<div class="w-50 d-flex justify-content-center align-items-center">
+							<span v-bind:class="{highlight: winner == 'O'}" class="h5 font-weight-bold">{{ o_points }}</span>
+						</div>
+
+					</div>
+
+					<div class="controls text-center">
+
+						<button v-if="gameOn == true" v-on:click="restart()" type="button" class="btn w-100 font-weight-bold">RESTART</button>
+
+						<button v-else v-on:click="playAgain()" type="button" class="btn w-100 font-weight-bold">PLAY AGAIN</button>
+
+						<button type="button" class="btn w-100 font-weight-bold mt-3" data-toggle="modal" data-target="#menuModal" v-on:click="showModal = true">
+							MENU
+						</button>
+
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+	</div>
+
+
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+	<script src="main.js"></script>
+
+
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+</body>
+</html>

@@ -1,0 +1,48 @@
+html, body {
+	font-family: 'Open Sans', sans-serif;
+	height: 100vh;
+	color: #DEE2E5;
+}
+
+#app {
+	background-color: #1D232F;
+}
+
+.modal-content {
+	background-color: #212633;
+	color: #DEE2E5;
+}
+
+.close {
+	color: #DEE2E5;
+}
+
+.selection_tile {
+	height: 4rem;
+	font-size: 2rem;
+	cursor: pointer;
+}
+
+.cell {
+	height: 10rem;
+	border: 1px solid #BCC5CF;
+	font-size: 4rem;
+	cursor: pointer;
+}
+
+.move {
+	border: 0.001rem solid #E66338;
+}
+
+i {
+	color: #BCC5CF;
+}
+
+.highlight {
+	color: #E66338;
+}
+
+button {
+	background: #252D38;
+	color: #BCC5CF;
+}
